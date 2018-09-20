@@ -13,7 +13,47 @@ class Products extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Image.asset(products[index]['image']),
-          Text(products[index]['title']),
+          Container(
+            margin: EdgeInsets.only(top: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  products[index]['title'],
+                  style: TextStyle(
+                    fontSize: 26.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Oswald',
+                  ),
+                ),
+                SizedBox(
+                  width: 8.0,
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 6.0,
+                    vertical: 2.5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).accentColor,
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  child: Text(
+                    '\$${products[index]['price'].toString()}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 1.0),
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+            child: Text('Union Square, San Fransisco'),
+          ),
           ButtonBar(
             alignment: MainAxisAlignment.center,
             children: <Widget>[
