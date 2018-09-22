@@ -40,8 +40,10 @@ class _MyAppState extends State<MyApp> {
       // debugShowMaterialGrid: true, //red grid across entire app
       theme: ThemeData(
           brightness: Brightness.light,
-          primarySwatch: Colors.deepOrange,
-          accentColor: Colors.deepPurple),
+          primarySwatch: Colors.deepOrange, //swatch - because other colors are derived from it 
+          accentColor: Colors.deepPurple,
+          buttonColor: Colors.deepPurple,
+          ),
       // home: AuthPage(),
       routes: {
         '/': (BuildContext context) => AuthPage(),

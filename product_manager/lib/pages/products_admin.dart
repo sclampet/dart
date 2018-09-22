@@ -62,6 +62,5 @@ class ProductsAdminPage extends StatelessWidget {
         body: _buildTabBar(),
       ),
     );
-    ;
   }
 }

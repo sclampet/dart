@@ -65,10 +65,14 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final double deviceWidth = MediaQuery.of(context).size.width;
+    final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
+    final double targetPadding = deviceWidth - targetWidth; //calculates the amount of space that remains as opposed to the width of the entire form
+
     return Container(
       margin: EdgeInsets.all(10.0),
-      child: ListView(
-        //used a listview so if the keyboard covers a textfield we can scroll and still enter info there.
+      child: ListView( //used a listview so if the keyboard covers a textfield we can scroll and still enter info there.
+        padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
         children: <Widget>[
           _buildTitleTextField(),
           _buildDescriptionTextField(),
@@ -76,7 +80,6 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
           SizedBox(height: 10.0),
           RaisedButton(
             child: Text('Save'),
-            color: Theme.of(context).accentColor,
             textColor: Colors.white,
             onPressed: _submitForm,
           ),
