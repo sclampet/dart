@@ -13,9 +13,12 @@ class ProductCreatePage extends StatefulWidget {
 }
 
 class _ProductCreatePageState extends State<ProductCreatePage> {
-  String _titleText;
-  String _descriptionValue;
-  double _productPrice;
+  final Map<String, dynamic> _formData = {
+    'title': null,
+    'description': null,
+    'price': null,
+    'image': 'assets/pancakes.jpg',
+  };
   final GlobalKey<FormState> _formKey = GlobalKey<
       FormState>(); //giving a key to a form - flutter gives access to the internal state of that form object
 
@@ -29,9 +32,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       },
       //this method isn't called until currentState.save() is called - currently in when we are submitting the form.
       onSaved: (String value) {
-        setState(() {
-          _titleText = value;
-        });
+          //no need to call setState because we just need to save the data not re-render the page for any reason.
+          _formData['title'] = value;
       },
     );
   }
@@ -47,9 +49,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       },
       //this method isn't called until currentState.save() is called - currently in when we are submitting the form.
       onSaved: (String value) {
-        setState(() {
-          _descriptionValue = value;
-        });
+          //no need to call setState because we just need to save the data not re-render the page for any reason.
+          _formData['desctription'] = value;
       },
     );
   }
@@ -66,9 +67,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       },
       //this method isn't called until currentState.save() is called - currently in when we are submitting the form.
       onSaved: (String value) {
-        setState(() {
-          _productPrice = double.parse(value);
-        });
+          _formData['price'] = double.parse(value);
       },
     );
   }
@@ -80,13 +79,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
     }
     //trigger all FormField onSaved methods
     _formKey.currentState.save();
-    final Map<String, dynamic> product = {
-      'title': _titleText,
-      'description': _descriptionValue,
-      'price': _productPrice,
-      'image': 'assets/pancakes.jpg',
-    };
-    widget.addProduct(product);
+    widget.addProduct(_formData);
     Navigator.pushReplacementNamed(context, '/products');
   }
 
