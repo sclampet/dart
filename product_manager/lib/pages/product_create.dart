@@ -67,7 +67,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
   Widget build(BuildContext context) {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
-    final double targetPadding = deviceWidth - targetWidth; //calculates the amount of space that remains as opposed to the width of the entire form
+    final double targetPadding = deviceWidth -
+        targetWidth; //calculates the amount of space that remains as opposed to the width of the entire form
 
     return Container(
       margin: EdgeInsets.all(10.0),
@@ -83,6 +84,14 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
             textColor: Colors.white,
             onPressed: _submitForm,
           ),
+          // GestureDetector( //use this if you need more control over a button
+          //   onTap: _submitForm,
+          //   child: Container(
+          //     color: Colors.green,
+          //     padding: EdgeInsets.all(10.0),
+          //     child: Text('Button'),
+          //   ),
+          // ),
         ],
       ),
     );
