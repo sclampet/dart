@@ -9,9 +9,13 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  String _emailValue;
-  String _passwordValue;
-  bool _acceptTerms = false;
+  final Map<String, dynamic> _formData = {
+    'email': null,
+    'pass': null,
+    'terms': false,
+  };
+  final GlobalKey<FormState> _formKey = GlobalKey<
+      FormState>();
 
   DecorationImage _buildBackgroundImage() {
     return DecorationImage(
@@ -23,51 +27,59 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   Widget _buildEmailTextField() {
-    return TextField(
+    return TextFormField(
       decoration: InputDecoration(
         labelText: 'Email',
         filled: true,
         fillColor: Colors.white,
       ),
       keyboardType: TextInputType.emailAddress,
-      onChanged: (String value) {
-        setState(() {
-          _emailValue = value;
-        });
+      validator: (String value) {
+        if(value.isEmpty || RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?").hasMatch(value)) {
+          return 'Must enter a valid email address';
+        }
+      },
+      onSaved: (String value) {
+          _formData['email'] = value;
       },
     );
   }
 
   Widget _buildPasswordTextField() {
-    return TextField(
+    return TextFormField(
       decoration: InputDecoration(
         labelText: 'Password',
         filled: true,
         fillColor: Colors.white,
       ),
       obscureText: true,
-      onChanged: (String value) {
-        setState(() {
-          _passwordValue = value;
-        });
+      validator: (String value) {
+        if(value.isEmpty || value.length < 5) {
+          return 'Password must be 5+ charcaters long';
+        }
+      },
+      onSaved: (String value) {
+          _formData['pass'] = value;
       },
     );
   }
 
   Widget _buildAcceptSwitch() {
     return SwitchListTile(
-      value: _acceptTerms,
+      value: _formData['terms'],
       onChanged: (bool val) {
-        setState(() {
-          _acceptTerms = val;
-        });
+          _formData['terms'] = val;
       },
       title: Text('Accept Terms'),
     );
   }
 
   void _submitForm() {
-    print(_emailValue + _passwordValue);
+    if(!_formKey.currentState.validate()) {
+      return;
+    }
+    _formKey.currentState.save();
+    print('Form Values'+ _formData.toString());
     Navigator.pushReplacementNamed(context, '/products');
   }
 
@@ -80,28 +92,39 @@ class _AuthPageState extends State<AuthPage> {
       appBar: AppBar(
         title: Text('Please Login'),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: _buildBackgroundImage(),
-        ),
-        padding: EdgeInsets.all(10.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Container( //wrapped login form in Container so we can define the width based on Landscape or Portrait mode
-              width: targetWidth, //sets width to be 80% of the current device
-              child: Column(
-                children: <Widget>[
-                  _buildEmailTextField(),
-                  SizedBox(height: 10.0),
-                  _buildPasswordTextField(),
-                  SizedBox(height: 10.0),
-                  _buildAcceptSwitch(),
-                  RaisedButton(
-                    textColor: Colors.white,
-                    child: Text('LOGIN'),
-                    onPressed: _submitForm,
+      body: GestureDetector(
+        onTap: () {
+          //close keyboard when tapping outside of form
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            image: _buildBackgroundImage(),
+          ),
+          padding: EdgeInsets.all(10.0),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
+                child: Container(
+                  //wrapped login form in Container so we can define the width based on Landscape or Portrait mode
+                  width:
+                      targetWidth, //sets width to be 80% of the current device
+                  child: Column(
+                    children: <Widget>[
+                      _buildEmailTextField(),
+                      SizedBox(height: 10.0),
+                      _buildPasswordTextField(),
+                      SizedBox(height: 10.0),
+                      _buildAcceptSwitch(),
+                      RaisedButton(
+                        textColor: Colors.white,
+                        child: Text('LOGIN'),
+                        onPressed: _submitForm,
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
