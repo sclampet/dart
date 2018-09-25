@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter/rendering.dart'; //for debugging
+// import 'package:flutter/rendering.dart';
 
-import './pages/products_admin.dart';
-import './pages/product.dart';
-import './pages/products.dart';
 import './pages/auth.dart';
+import './pages/products_admin.dart';
+import './pages/products.dart';
+import './pages/product.dart';
 
 void main() {
-  // debugPaintSizeEnabled = true; //shows components in blue border
-  // debugPaintPointersEnabled = true; //tap highlighting
+  // debugPaintSizeEnabled = true;
+  // debugPaintBaselinesEnabled = true;
+  // debugPaintPointersEnabled = true;
   runApp(MyApp());
 }
 
@@ -26,6 +27,13 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _products.add(product);
     });
+    print(_products);
+  }
+
+  void _updateProduct(int index, Map<String, dynamic> product) {
+    setState(() {
+      _products[index] = product;
+    });
   }
 
   void _deleteProduct(int index) {
@@ -37,44 +45,39 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // debugShowMaterialGrid: true, //red grid across entire app
+      // debugShowMaterialGrid: true,
       theme: ThemeData(
           brightness: Brightness.light,
-          primarySwatch: Colors.deepOrange, //swatch - because other colors are derived from it 
+          primarySwatch: Colors.deepOrange,
           accentColor: Colors.deepPurple,
-          buttonColor: Colors.deepPurple,
-          ),
+          buttonColor: Colors.deepPurple),
       // home: AuthPage(),
       routes: {
         '/': (BuildContext context) => AuthPage(),
         '/products': (BuildContext context) => ProductsPage(_products),
         '/admin': (BuildContext context) =>
-            ProductsAdminPage(_addProduct, _deleteProduct, _products)
+            ProductsAdminPage(_addProduct, _updateProduct, _deleteProduct, _products),
       },
       onGenerateRoute: (RouteSettings settings) {
         final List<String> pathElements = settings.name.split('/');
         if (pathElements[0] != '') {
-          //if path doesn't start with a '/' return null;
+          return null;
         }
         if (pathElements[1] == 'product') {
           final int index = int.parse(pathElements[2]);
-
           return MaterialPageRoute<bool>(
             builder: (BuildContext context) => ProductPage(
-                  _products[index]['title'],
-                  _products[index]['image'],
-                  _products[index]['price'],
-                  _products[index]['description'],
-                ),
+                _products[index]['title'],
+                _products[index]['image'],
+                _products[index]['price'],
+                _products[index]['description']),
           );
         }
         return null;
       },
-      //if generateRoute fails this will run. Play it safe! :)
       onUnknownRoute: (RouteSettings settings) {
         return MaterialPageRoute(
-          builder: (BuildContext context) => ProductsPage(_products),
-        );
+            builder: (BuildContext context) => ProductsPage(_products));
       },
     );
   }

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/helpers/ensure-visible.dart';
+
 class ProductEditPage extends StatefulWidget {
   final Function addProduct;
   final Function updateProduct;
   final Map<String, dynamic> product;
+  final int productIndex;
 
-  ProductEditPage({this.addProduct, this.updateProduct, this.product});
+  ProductEditPage(
+      {this.addProduct, this.updateProduct, this.product, this.productIndex});
 
   @override
   State<StatefulWidget> createState() {
@@ -18,69 +22,89 @@ class _ProductEditPageState extends State<ProductEditPage> {
     'title': null,
     'description': null,
     'price': null,
-    'image': 'assets/pancakes.jpg',
+    'image': 'assets/food.jpg'
   };
-  final GlobalKey<FormState> _formKey = GlobalKey<
-      FormState>(); //giving a key to a form - flutter gives access to the internal state of that form object
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final _titleFocusNode = FocusNode();
+  final _descriptionFocusNode = FocusNode();
+  final _priceFocusNode = FocusNode();
 
   Widget _buildTitleTextField() {
-    return TextFormField(
-      decoration: InputDecoration(labelText: 'Product Title'),
-      validator: (String value) {
-        if (value.isEmpty || value.length < 5) {
-          return 'A title is required and should be 5+ characters long';
-        }
-      },
-      //this method isn't called until currentState.save() is called - currently in when we are submitting the form.
-      onSaved: (String value) {
-          //no need to call setState because we just need to save the data not re-render the page for any reason.
+    return EnsureVisibleWhenFocused(
+      focusNode: _titleFocusNode,
+      child: TextFormField(
+        focusNode: _titleFocusNode,
+        decoration: InputDecoration(labelText: 'Product Title'),
+        initialValue: widget.product == null ? '' : widget.product['title'],
+        validator: (String value) {
+          // if (value.trim().length <= 0) {
+          if (value.isEmpty || value.length < 5) {
+            return 'Title is required and should be 5+ characters long.';
+          }
+        },
+        onSaved: (String value) {
           _formData['title'] = value;
-      },
+        },
+      ),
     );
   }
 
   Widget _buildDescriptionTextField() {
-    return TextFormField(
-      decoration: InputDecoration(labelText: 'Product Description'),
-      maxLines: 4,
-      validator: (String value) {
-        if (value.isEmpty || value.length < 10) {
-          return 'A description is required and should be 10+ characters long';
-        }
-      },
-      //this method isn't called until currentState.save() is called - currently in when we are submitting the form.
-      onSaved: (String value) {
-          //no need to call setState because we just need to save the data not re-render the page for any reason.
-          _formData['desctription'] = value;
-      },
+    return EnsureVisibleWhenFocused(
+      focusNode: _descriptionFocusNode,
+      child: TextFormField(
+        focusNode: _descriptionFocusNode,
+        maxLines: 4,
+        decoration: InputDecoration(labelText: 'Product Description'),
+        initialValue:
+            widget.product == null ? '' : widget.product['description'],
+        validator: (String value) {
+          // if (value.trim().length <= 0) {
+          if (value.isEmpty || value.length < 10) {
+            return 'Description is required and should be 10+ characters long.';
+          }
+        },
+        onSaved: (String value) {
+          _formData['description'] = value;
+        },
+      ),
     );
   }
 
   Widget _buildPriceTextField() {
-    return TextFormField(
-      decoration: InputDecoration(labelText: 'Product Price'),
-      keyboardType: TextInputType.number,
-      validator: (String value) {
-        if (value.isEmpty ||
-            !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
-          return 'A price is required and should be a number';
-        }
-      },
-      //this method isn't called until currentState.save() is called - currently in when we are submitting the form.
-      onSaved: (String value) {
+    return EnsureVisibleWhenFocused(
+      focusNode: _priceFocusNode,
+      child: TextFormField(
+        focusNode: _priceFocusNode,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(labelText: 'Product Price'),
+        initialValue:
+            widget.product == null ? '' : widget.product['price'].toString(),
+        validator: (String value) {
+          // if (value.trim().length <= 0) {
+          if (value.isEmpty ||
+              !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
+            return 'Price is required and should be a number.';
+          }
+        },
+        onSaved: (String value) {
           _formData['price'] = double.parse(value);
-      },
+        },
+      ),
     );
   }
 
   void _submitForm() {
-    //run validator code once the use hits save. 'validate()' returns a bool
     if (!_formKey.currentState.validate()) {
       return;
     }
-    //trigger all FormField onSaved methods
     _formKey.currentState.save();
-    widget.addProduct(_formData);
+    if (widget.product == null) {
+      widget.addProduct(_formData);
+    } else {
+      widget.updateProduct(widget.productIndex, _formData);
+    }
+
     Navigator.pushReplacementNamed(context, '/products');
   }
 
@@ -88,14 +112,9 @@ class _ProductEditPageState extends State<ProductEditPage> {
   Widget build(BuildContext context) {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
-    final double targetPadding = deviceWidth -
-        targetWidth; //calculates the amount of space that remains as opposed to the width of the entire form
-
-    return GestureDetector(
-      //register when the user taps anywhere but the keyboard
+    final double targetPadding = deviceWidth - targetWidth;
+    final Widget pageContent = GestureDetector(
       onTap: () {
-        //every TextField has an attached focus node that is used automatically when tapping it.
-        //to remove the focus node and close the keyboard - pass an empty focus node (remove the focus node).
         FocusScope.of(context).requestFocus(FocusNode());
       },
       child: Container(
@@ -103,30 +122,39 @@ class _ProductEditPageState extends State<ProductEditPage> {
         child: Form(
           key: _formKey,
           child: ListView(
-            //used a listview so if the keyboard covers a textfield we can scroll and still enter info there.
             padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
             children: <Widget>[
               _buildTitleTextField(),
               _buildDescriptionTextField(),
               _buildPriceTextField(),
-              SizedBox(height: 10.0),
+              SizedBox(
+                height: 10.0,
+              ),
               RaisedButton(
                 child: Text('Save'),
                 textColor: Colors.white,
                 onPressed: _submitForm,
-              ),
-              // GestureDetector( //use this if you need more control over a button
+              )
+              // GestureDetector(
               //   onTap: _submitForm,
               //   child: Container(
               //     color: Colors.green,
-              //     padding: EdgeInsets.all(10.0),
-              //     child: Text('Button'),
+              //     padding: EdgeInsets.all(5.0),
+              //     child: Text('My Button'),
               //   ),
-              // ),
+              // )
             ],
           ),
         ),
       ),
     );
+    return widget.product == null
+        ? pageContent
+        : Scaffold(
+            appBar: AppBar(
+              title: Text('Edit Product'),
+            ),
+            body: pageContent,
+          );
   }
 }
