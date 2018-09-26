@@ -14,7 +14,7 @@ class ProductsModel extends Model {
 
   List<Product> get displayedProducts {
     if (_showFavorites) {
-      return _products.where((Product product) => product.isFavorite).toList());
+      return _products.where((Product product) => product.isFavorite).toList();
     }
     return List.from(_products);
   }
