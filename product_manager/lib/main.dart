@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:scoped_model/scoped_model.dart';
 // import 'package:flutter/rendering.dart';
 
@@ -48,8 +49,9 @@ class _MyAppState extends State<MyApp> {
           if (pathElements[1] == 'product') {
             final int index = int.parse(pathElements[2]);
             return MaterialPageRoute<bool>(
-                builder: (BuildContext context) =>
-                    ProductPage(index),);
+              builder: (BuildContext context) =>
+                  ProductPage(index),
+            );
           }
           return null;
         },
