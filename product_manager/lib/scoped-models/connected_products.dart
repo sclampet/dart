@@ -87,6 +87,13 @@ class ProductsModel extends ConnectedProductsModel {
     notifyListeners();
   }
 
+  void fetchProducts() {
+    http.get('https://product-manager-448f5.firebaseio.com/products.json')
+    .then((http.Response res) {
+      print(json.decode(res.body));
+    });
+  }
+
   void toggleProductFavoriteStatus() {
     final bool isCurrentlyFavorite = selectedProduct.isFavorite;
     final bool newFavoriteStatus = !isCurrentlyFavorite;
