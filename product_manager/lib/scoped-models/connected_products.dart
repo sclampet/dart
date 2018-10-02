@@ -1,6 +1,7 @@
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 
 import '../models/product.dart';
 import '../models/user.dart';
@@ -9,9 +10,16 @@ class ConnectedProductsModel extends Model {
   List<Product> _products = [];
   int _selProductIndex;
   User _authenticatedUser;
+  bool _isLoading = false;
 
-  void addProduct(
-      String title, String description, String image, double price) {
+  Future<Null> addProduct(
+      //returns a null future so that we can show the loading indicator before navigating away from add product page
+      String title,
+      String description,
+      String image,
+      double price) {
+    _isLoading = true;
+    notifyListeners();
     final Map<String, dynamic> productData = {
       'title': title,
       'description': description,
@@ -21,7 +29,7 @@ class ConnectedProductsModel extends Model {
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id,
     };
-    http
+    return http
         .post(
       'https://product-manager-448f5.firebaseio.com/products.json',
       body: json.encode(productData),
@@ -37,6 +45,7 @@ class ConnectedProductsModel extends Model {
           userEmail: _authenticatedUser.email,
           userId: _authenticatedUser.id);
       _products.add(newProduct);
+      _isLoading = false;
       notifyListeners();
     });
   }
@@ -90,14 +99,20 @@ class ProductsModel extends ConnectedProductsModel {
   }
 
   void fetchProducts() {
+    _isLoading = true;
+    notifyListeners();
     http
         .get('https://product-manager-448f5.firebaseio.com/products.json')
         .then((http.Response res) {
       final List<Product> fetchedProductList = [];
-      final Map<String, dynamic> productListData =
-          json.decode(res.body);
-      productListData
-          .forEach((String productId, dynamic productData) {
+      final Map<String, dynamic> productListData = json.decode(res.body);
+      if (productListData == null) {
+        //return if there isn't a productData;
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+      productListData.forEach((String productId, dynamic productData) {
         final Product product = Product(
           id: productId,
           title: productData['title'],
@@ -110,6 +125,7 @@ class ProductsModel extends ConnectedProductsModel {
         fetchedProductList.add(product);
       });
       _products = fetchedProductList;
+      _isLoading = false;
       notifyListeners();
     });
   }
@@ -144,5 +160,11 @@ class UserModel extends ConnectedProductsModel {
   void login(String email, String password) {
     _authenticatedUser =
         User(id: 'fdalsdfasf', email: email, password: password);
+  }
+}
+
+class UtilityModel extends ConnectedProductsModel {
+  bool get isLoading {
+    return _isLoading;
   }
 }
