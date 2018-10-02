@@ -18,6 +18,8 @@ class ConnectedProductsModel extends Model {
       'image':
           'https://s.newsweek.com/sites/www.newsweek.com/files/styles/embed-lg/public/2018/08/28/chocolate-stock.jpg',
       'price': price,
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id,
     };
     http
         .post(
@@ -88,9 +90,27 @@ class ProductsModel extends ConnectedProductsModel {
   }
 
   void fetchProducts() {
-    http.get('https://product-manager-448f5.firebaseio.com/products.json')
-    .then((http.Response res) {
-      print(json.decode(res.body));
+    http
+        .get('https://product-manager-448f5.firebaseio.com/products.json')
+        .then((http.Response res) {
+      final List<Product> fetchedProductList = [];
+      final Map<String, dynamic> productListData =
+          json.decode(res.body);
+      productListData
+          .forEach((String productId, dynamic productData) {
+        final Product product = Product(
+          id: productId,
+          title: productData['title'],
+          description: productData['description'],
+          image: productData['image'],
+          price: productData['price'],
+          userEmail: productData['userEmail'],
+          userId: productData['userId'],
+        );
+        fetchedProductList.add(product);
+      });
+      _products = fetchedProductList;
+      notifyListeners();
     });
   }
 
