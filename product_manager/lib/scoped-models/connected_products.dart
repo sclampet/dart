@@ -113,8 +113,18 @@ class ProductsModel extends ConnectedProductsModel {
   }
 
   void deleteProduct() {
-    _products.removeAt(selectedProductIndex);
+    _isLoading = true;
+    final deletedProductId = selectedProduct.id;
+      _products.removeAt(selectedProductIndex);
+      _selProductIndex = null;
     notifyListeners();
+    http
+        .delete(
+            'https://product-manager-448f5.firebaseio.com/products/${deletedProductId}.json')
+        .then((http.Response res) {
+      _isLoading = false;
+      notifyListeners();
+    });
   }
 
   void fetchProducts() {
