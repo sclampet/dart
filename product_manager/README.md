@@ -2,7 +2,7 @@
 
 A "Let Go" type app. Users can create an account in order to view, create, edit, favorite, and share different products.
 
-My first full stack iOS and Android app built using Dart with the Flutter SDK, Material for design and firebase as the backend.
+My first full stack iOS and Android app built using Dart with the Flutter SDK, Material for design, and firebase as the backend.
 
 This app will be depolyed to both Android's Play Store and Apple's App Store once it is finished. 
 
