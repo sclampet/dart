@@ -127,10 +127,10 @@ class ProductsModel extends ConnectedProductsModel {
     });
   }
 
-  void fetchProducts() {
+  Future<Null> fetchProducts() {
     _isLoading = true;
     notifyListeners();
-    http
+    return http
         .get('https://product-manager-448f5.firebaseio.com/products.json')
         .then((http.Response res) {
       final List<Product> fetchedProductList = [];
