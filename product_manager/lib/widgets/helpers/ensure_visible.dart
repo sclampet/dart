@@ -71,8 +71,8 @@ class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused> {
     //   // Move up to the bottom of the viewport
     //   alignment = 1.0;
     // } else {
-      // No scrolling is necessary to reveal the child
-      return;
+    //   // No scrolling is necessary to reveal the child
+    //   return;
     // }
     position.ensureVisible(
       object,
