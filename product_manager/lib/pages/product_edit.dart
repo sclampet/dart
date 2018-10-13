@@ -169,7 +169,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   title: Text('Something went wrong'),
                   content: Text('Please try again!'),
                   actions: <Widget>[
-                    FlatButton(
+                    RaisedButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: Text('Okay'),
                     )

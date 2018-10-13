@@ -109,7 +109,7 @@ class _AuthPageState extends State<AuthPage> {
             title: Text('An Error Occurred!'),
             content: Text(successInformation['message']),
             actions: <Widget>[
-              FlatButton(
+              RaisedButton(
                 child: Text('Okay'),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -158,7 +158,7 @@ class _AuthPageState extends State<AuthPage> {
                     SizedBox(
                       height: 10.0,
                     ),
-                    FlatButton(
+                    RaisedButton(
                       child: Text(
                           'Switch to ${_authMode == AuthMode.Login ? 'Signup' : 'Login'}'),
                       onPressed: () {
