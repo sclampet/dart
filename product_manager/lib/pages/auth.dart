@@ -100,7 +100,7 @@ class _AuthPageState extends State<AuthPage> {
     successInformation = await authenticate(
         _formData['email'], _formData['password'], _authMode);
     if (successInformation['success']) {
-      Navigator.pushReplacementNamed(context, '/products');
+      // Navigator.pushReplacementNamed(context, '/');
     } else {
       showDialog(
         context: context,
@@ -109,7 +109,7 @@ class _AuthPageState extends State<AuthPage> {
             title: Text('An Error Occurred!'),
             content: Text(successInformation['message']),
             actions: <Widget>[
-              RaisedButton(
+              FlatButton(
                 child: Text('Okay'),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -158,7 +158,7 @@ class _AuthPageState extends State<AuthPage> {
                     SizedBox(
                       height: 10.0,
                     ),
-                    RaisedButton(
+                    FlatButton(
                       child: Text(
                           'Switch to ${_authMode == AuthMode.Login ? 'Signup' : 'Login'}'),
                       onPressed: () {
