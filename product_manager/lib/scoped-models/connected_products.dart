@@ -70,7 +70,7 @@ class ProductsModel extends ConnectedProductsModel {
     };
     try {
       final http.Response response = await http.post(
-          'https://flutter-products.firebaseio.com/products.json?auth=${_authenticatedUser.token}',
+          'https://product-manager-448f5.firebaseio.com/products.json?auth=${_authenticatedUser.token}',
           body: json.encode(productData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -118,7 +118,7 @@ class ProductsModel extends ConnectedProductsModel {
     };
     return http
         .put(
-            'https://flutter-products.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}',
+            'https://product-manager-448f5.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}',
             body: json.encode(updateData))
         .then((http.Response reponse) {
       _isLoading = false;
@@ -148,7 +148,7 @@ class ProductsModel extends ConnectedProductsModel {
     notifyListeners();
     return http
         .delete(
-            'https://flutter-products.firebaseio.com/products/${deletedProductId}.json?auth=${_authenticatedUser.token}')
+            'https://product-manager-448f5.firebaseio.com/products/${deletedProductId}.json?auth=${_authenticatedUser.token}')
         .then((http.Response response) {
       _isLoading = false;
       notifyListeners();
@@ -165,7 +165,7 @@ class ProductsModel extends ConnectedProductsModel {
     notifyListeners();
     return http
         .get(
-            'https://flutter-products.firebaseio.com/products.json?auth=${_authenticatedUser.token}')
+            'https://product-manager-448f5.firebaseio.com/products.json?auth=${_authenticatedUser.token}')
         .then<Null>((http.Response response) {
       final List<Product> fetchedProductList = [];
       final Map<String, dynamic> productListData = json.decode(response.body);
@@ -196,9 +196,10 @@ class ProductsModel extends ConnectedProductsModel {
     });
   }
 
-  void toggleProductFavoriteStatus() {
+  void toggleProductFavoriteStatus() async {
     final bool isCurrentlyFavorite = selectedProduct.isFavorite;
     final bool newFavoriteStatus = !isCurrentlyFavorite;
+    //update product locally first
     final Product updatedProduct = Product(
         id: selectedProduct.id,
         title: selectedProduct.title,
@@ -210,6 +211,29 @@ class ProductsModel extends ConnectedProductsModel {
         isFavorite: newFavoriteStatus);
     _products[selectedProductIndex] = updatedProduct;
     notifyListeners();
+    http.Response response;
+    if (newFavoriteStatus) {
+      //add current auth user id to product
+      response = await http.put(
+          'https://product-manager-448f5.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
+          body: json.encode(true));
+    } else {
+      response = await http.delete(
+          'https://product-manager-448f5.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}');
+    }
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      final Product updatedProduct = Product(
+          id: selectedProduct.id,
+          title: selectedProduct.title,
+          description: selectedProduct.description,
+          price: selectedProduct.price,
+          image: selectedProduct.image,
+          userEmail: selectedProduct.userEmail,
+          userId: selectedProduct.userId,
+          isFavorite: !newFavoriteStatus);
+      _products[selectedProductIndex] = updatedProduct;
+      notifyListeners();
+    }
   }
 
   void selectProduct(String productId) {
@@ -246,14 +270,15 @@ class UserModel extends ConnectedProductsModel {
     };
     http.Response response;
     if (mode == AuthMode.Login) {
+      print('attempting to login');
       response = await http.post(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyDRNWISSlMAV8cduZYT9sEVKhRx6qdwJcc',
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyCDetc7Yn2JyA87jkmzySpyhxlAjHsZVJE',
         body: json.encode(authData),
         headers: {'Content-Type': 'application/json'},
       );
     } else {
       response = await http.post(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyDRNWISSlMAV8cduZYT9sEVKhRx6qdwJcc',
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyCDetc7Yn2JyA87jkmzySpyhxlAjHsZVJE',
         body: json.encode(authData),
         headers: {'Content-Type': 'application/json'},
       );
